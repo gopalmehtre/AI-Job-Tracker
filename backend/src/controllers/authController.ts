@@ -6,7 +6,7 @@ import type { AuthRequest } from "../types";
 
 const generateToken = (userId: string): string => {
   return jwt.sign({ userId }, process.env.JWT_SECRET as string, {
-    expiresIn: (process.env.JWT_EXPIRES_IN as string) ?? "7d",
+    expiresIn: (process.env.JWT_EXPIRES_IN || "7d") as any,
   });
 };
 
@@ -32,7 +32,7 @@ export const register = async (
     }
 
     const user = await User.create({ email, password, name });
-    const token = generateToken(user._id as string);
+    const token = generateToken(String(user._id));
 
     res.status(201).json({
       token,
@@ -65,7 +65,7 @@ export const login = async (
       throw createError("Invalid credentials", 401);
     }
 
-    const token = generateToken(user._id as string);
+    const token = generateToken(String(user._id));
 
     res.json({
       token,
